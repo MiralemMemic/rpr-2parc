@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class GradController {
     public TextField fieldNaziv;
     public TextField fieldBrojStanovnika;
+    public TextField fieldNadmorskaVisina;
     public ChoiceBox<Drzava> choiceDrzava;
     public ObservableList<Drzava> listDrzave;
     private Grad grad;
@@ -33,6 +34,7 @@ public class GradController {
             for (Drzava drzava : listDrzave)
                 if (drzava.getId() == grad.getDrzava().getId())
                     choiceDrzava.getSelectionModel().select(drzava);
+            fieldNadmorskaVisina.setText(Integer.toString(grad.getNadmorskaVisina()));
         } else {
             choiceDrzava.getSelectionModel().selectFirst();
         }
@@ -76,12 +78,32 @@ public class GradController {
             fieldBrojStanovnika.getStyleClass().add("poljeIspravno");
         }
 
+        int nadmorskaVisina = 0;
+        try {
+            nadmorskaVisina = Integer.parseInt(fieldNadmorskaVisina.getText());
+        } catch (NumberFormatException e) {
+            // ...
+        }
+        if (nadmorskaVisina < -400 || nadmorskaVisina > 8000) {
+            fieldNadmorskaVisina.getStyleClass().removeAll("poljeIspravno");
+            fieldNadmorskaVisina.getStyleClass().add("poljeNijeIspravno");
+            if(!fieldNadmorskaVisina.textProperty().get().isEmpty()) {
+                sveOk = false;
+            }
+        } else {
+            fieldNadmorskaVisina.getStyleClass().removeAll("poljeNijeIspravno");
+            fieldNadmorskaVisina.getStyleClass().add("poljeIspravno");
+        }
+
         if (!sveOk) return;
 
         if (grad == null) grad = new Grad();
         grad.setNaziv(fieldNaziv.getText());
         grad.setBrojStanovnika(Integer.parseInt(fieldBrojStanovnika.getText()));
         grad.setDrzava(choiceDrzava.getValue());
+        if(!fieldNadmorskaVisina.textProperty().get().isEmpty()) {
+            grad.setNadmorskaVisina(Integer.parseInt(fieldNadmorskaVisina.getText()));
+        }
         Stage stage = (Stage) fieldNaziv.getScene().getWindow();
         stage.close();
     }
